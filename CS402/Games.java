@@ -2,6 +2,7 @@ package CS402;
 
 import java.util.HashSet;
 import java.util.InputMismatchException;
+import java.util.NoSuchElementException;
 import java.util.Random;
 import java.util.Scanner;
 
@@ -133,7 +134,7 @@ public class Games {
             System.out.println("Choose difficulty level: Easy, Medium, Hard");
             String difficulty = scanner.nextLine().toLowerCase();
 
-            int attempts = 0;
+            int attempts;
             switch (difficulty) {
                 case "easy" -> attempts = 10;
                 case "medium" -> attempts = 5;
@@ -204,63 +205,62 @@ public class Games {
     }
 
     public static void TicTacToe(String[] args) {
-        Scanner scanner = new Scanner(System.in);
-        board = new char[3][3];
-        currentPlayer = 'X';
-
-        for (int i = 0; i < 3; i++) {
-            for (int j = 0; j < 3; j++) {
-                board[i][j] = ' ';
-            }
-        }
-
-        System.out.println("Welcome to Tic Tac Toe!");
-        printBoard();
-
-        while (true) {
-            System.out.printf("Player %c, enter a number (1-9) to choose a space: ", currentPlayer);
-            int move = 0;
-            boolean validInput = false;
-
-            while (!validInput) {
-                try {
-                    move = scanner.nextInt();
-                    if (move < 1 || move > 9) {
-                        System.out.println("Invalid move. Please enter a number between 1 and 9.");
-                    } else {
-                        int row = (move - 1) / 3;
-                        int col = (move - 1) % 3;
-                        if (board[row][col] != ' ') {
-                            System.out.println("This space is already occupied. Choose another space.");
-                        } else {
-                            board[row][col] = currentPlayer;
-                            validInput = true;
-                        }
-                    }
-                } catch (InputMismatchException e) {
-                    System.out.println("Invalid input. Please enter a valid number.");
-                    scanner.next(); // Clear the invalid input
+        try (Scanner scanner = new Scanner(System.in)) {
+            board = new char[3][3];
+            currentPlayer = 'X';
+            
+            for (int i = 0; i < 3; i++) {
+                for (int j = 0; j < 3; j++) {
+                    board[i][j] = ' ';
                 }
             }
-
+            
+            System.out.println("Welcome to Tic Tac Toe!");
             printBoard();
-
-            if (checkWinner()) {
-                System.out.printf("Player %c wins!%n", currentPlayer);
-                break;
+            
+            while (true) {
+                System.out.printf("Player %c, enter a number (1-9) to choose a space: ", currentPlayer);
+                int move;
+                boolean validInput = false;
+                
+                while (!validInput) {
+                    try {
+                        move = scanner.nextInt();
+                        if (move < 1 || move > 9) {
+                            System.out.println("Invalid move. Please enter a number between 1 and 9.");
+                        } else {
+                            int row = (move - 1) / 3;
+                            int col = (move - 1) % 3;
+                            if (board[row][col] != ' ') {
+                                System.out.println("This space is already occupied. Choose another space.");
+                            } else {
+                                board[row][col] = currentPlayer;
+                                validInput = true;
+                            }
+                        }
+                    } catch (InputMismatchException e) {
+                        System.out.println("Invalid input. Please enter a valid number.");
+                        scanner.next(); // Clear the invalid input
+                    }
+                }
+                
+                printBoard();
+                
+                if (checkWinner()) {
+                    System.out.printf("Player %c wins!%n", currentPlayer);
+                    break;
+                }
+                
+                if (isBoardFull()) {
+                    System.out.println("It's a draw!");
+                    break;
+                }
+                
+                currentPlayer = (currentPlayer == 'X') ? 'O' : 'X';
             }
-
-            if (isBoardFull()) {
-                System.out.println("It's a draw!");
-                break;
-            }
-
-            currentPlayer = (currentPlayer == 'X') ? 'O' : 'X';
+            PlayAgain(args, "Tic Tac Toe");
         }
 
-        scanner.close();
-
-        PlayAgain(args, "Tic Tac Toe");
     }
 
     public static void Hangman(String[] args) {
@@ -326,11 +326,27 @@ public class Games {
         }
     }
 
-    public static void PlayAgain(String[] args, String lastGamePlayed) {
+       public static void PlayAgain(String[] args, String lastGamePlayed) {
         try (Scanner scanner = new Scanner(System.in)) {
-            System.out.println("Would you like to play again or choose another game? (play again/choose another/quit)");
-            String playAgainResponse = scanner.nextLine().toLowerCase();
+            String playAgainResponse = "";
+ 
+            // Loop until a valid input is received
+            while (true) {
+                System.out.println("Would you like to play again or choose another game? (play again/choose another/quit)");
+                if (scanner.hasNextLine()) {
+                    playAgainResponse = scanner.nextLine().toLowerCase();
 
+                    if (playAgainResponse.equals("play again") || playAgainResponse.equals("choose another") || playAgainResponse.equals("quit")) {
+                        break; // Exit loop if valid input is received
+                    } else {
+                        System.out.println("Invalid choice. Please enter 'play again', 'choose another', or 'quit'.");
+                    }
+                } else {
+                    System.out.println("No input received. Please try again.");
+                }
+            }
+
+            // Handle the valid input
             switch (playAgainResponse) {
                 case "play again" -> {
                     switch (lastGamePlayed) {
@@ -347,6 +363,8 @@ public class Games {
                 case "quit" -> System.out.println("Thanks for playing!");
                 default -> throw new AssertionError("Invalid choice: " + playAgainResponse);
             }
+        } catch (NoSuchElementException e) {
+            System.err.println("Error: No input received.");
         }
     }
 
