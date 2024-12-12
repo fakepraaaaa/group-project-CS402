@@ -11,9 +11,9 @@ public class GameSelect {
                 + "========================================";
 
         String formattedString = String.format(template,
-                "id1", "name1",
-                "id2", "name2",
-                "id3", "name3");
+                "12471043", "mok king lam",
+                "12471044", "Pong Tsz Cheuk James",
+                "12471046", "Lam Yu Hin");
 
         System.out.println(formattedString);
 
