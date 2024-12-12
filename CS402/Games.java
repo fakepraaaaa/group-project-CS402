@@ -266,8 +266,7 @@ public class Games {
     public static void Hangman(String[] args) {
         try (Scanner scanner = new Scanner(System.in)) {
             System.out.println("Welcome to Hangman!");
-            String[] words = { "apple", "banana", "orange", "grapes", "mango" }; // add more words here if you feel like
-                                                                                 // it
+            String[] words = { "apple", "banana", "orange", "grapes", "mango" }; // add more words here if you feel like it
             String word = words[(int) (Math.random() * words.length)];
             char[] guessedWord = new char[word.length()];
             for (int i = 0; i < word.length(); i++) {
